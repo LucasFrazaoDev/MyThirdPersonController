@@ -9,7 +9,8 @@ public class PlayerController : MonoBehaviour
     public float maxForwardSpeed = 8f;
     public float turnSpeed = 100f;
 
-    private Vector2 _moveDiretion;
+    private float _jumpDirection;
+    private Vector2 _moveDirection;
     private float _desiredSpeed;
     private float _fowardSpeed;
 
@@ -20,12 +21,17 @@ public class PlayerController : MonoBehaviour
 
     private bool isMoveInput
     {
-        get { return !Mathf.Approximately(_moveDiretion.sqrMagnitude, 0f); }
+        get { return !Mathf.Approximately(_moveDirection.sqrMagnitude, 0f); }
     }
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        _moveDiretion = context.ReadValue<Vector2>();
+        _moveDirection = context.ReadValue<Vector2>();
+    }
+
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        _jumpDirection = context.ReadValue<float>();
     }
 
     private void Move(Vector2 direction)
@@ -45,6 +51,11 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    private void Jump(float direction)
+    {
+        Debug.Log(direction);
+    }
+
     private void Awake()
     {
         anim = GetComponent<Animator>();
@@ -53,6 +64,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Move(_moveDiretion);
+        Move(_moveDirection);
+        Jump(_jumpDirection);
     }
 }
