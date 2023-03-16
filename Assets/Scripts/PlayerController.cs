@@ -13,11 +13,14 @@ public class PlayerController : MonoBehaviour
     private Vector2 _moveDirection;
     private float _desiredSpeed;
     private float _fowardSpeed;
+    private bool readyJump = false;
+    private float jumpSpeed = 20000f;
 
     const float GROUND_ACCEL = 5f;
     const float GROUND_DECEL = 25f;
 
     private Animator anim;
+    private Rigidbody rb;
 
     private bool isMoveInput
     {
@@ -54,11 +57,28 @@ public class PlayerController : MonoBehaviour
     private void Jump(float direction)
     {
         Debug.Log(direction);
+        if (direction > 0)
+        {
+            anim.SetBool("ReadyJump", true);
+            readyJump = true;
+            
+        } else if(readyJump)
+        {
+            anim.SetBool("Launch", true);
+        }
+    }
+
+    public void Launch()
+    {
+        rb.AddForce(0, jumpSpeed, 0);
+        anim.SetBool("Launch", false);
+        anim.applyRootMotion = false;
     }
 
     private void Awake()
     {
         anim = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
