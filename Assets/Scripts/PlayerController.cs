@@ -15,6 +15,8 @@ public class PlayerController : MonoBehaviour
     private float _fowardSpeed;
     private bool readyJump = false;
     private float jumpSpeed = 20000f;
+    private bool onGround = true;
+    private float groundRayDistance = 1f;
 
     const float GROUND_ACCEL = 5f;
     const float GROUND_DECEL = 25f;
@@ -25,6 +27,21 @@ public class PlayerController : MonoBehaviour
     private bool isMoveInput
     {
         get { return !Mathf.Approximately(_moveDirection.sqrMagnitude, 0f); }
+    }
+
+    private void Awake()
+    {
+        anim = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody>();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        Move(_moveDirection);
+        Jump(_jumpDirection);
+
+        CheckOnGround();
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -41,7 +58,7 @@ public class PlayerController : MonoBehaviour
     {
         float turnAmount = direction.x;
         float fDirection = direction.y;
-        if(direction.sqrMagnitude > 1f)
+        if (direction.sqrMagnitude > 1f)
             direction.Normalize();
 
         _desiredSpeed = direction.magnitude * maxForwardSpeed * Mathf.Sign(fDirection);
@@ -56,16 +73,38 @@ public class PlayerController : MonoBehaviour
 
     private void Jump(float direction)
     {
-        Debug.Log(direction);
-        if (direction > 0)
+        if (direction > 0 && onGround)
         {
             anim.SetBool("ReadyJump", true);
             readyJump = true;
-            
-        } else if(readyJump)
+
+        }
+        else if (readyJump)
         {
             anim.SetBool("Launch", true);
+            readyJump = false;
+            anim.SetBool("ReadyJump", false);
         }
+    }
+
+    private void CheckOnGround()
+    {
+        RaycastHit hit;
+        Ray ray = new Ray(transform.position + Vector3.up * groundRayDistance * 0.5f, -Vector3.up);
+        if (Physics.Raycast(ray, out hit, groundRayDistance))
+        {
+            if (!onGround)
+            {
+                onGround = true;
+                anim.SetBool("Land", true);
+            }
+        }
+        else
+        {
+            onGround = false;
+        }
+
+        Debug.DrawRay(transform.position + Vector3.up * groundRayDistance * 0.5f, -Vector3.up * groundRayDistance, Color.red);
     }
 
     public void Launch()
@@ -75,16 +114,10 @@ public class PlayerController : MonoBehaviour
         anim.applyRootMotion = false;
     }
 
-    private void Awake()
+    public void Land()
     {
-        anim = GetComponent<Animator>();
-        rb = GetComponent<Rigidbody>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        Move(_moveDirection);
-        Jump(_jumpDirection);
+        anim.SetBool("Land", false);
+        anim.applyRootMotion = true;
+        anim.SetBool("Launch", false);
     }
 }
