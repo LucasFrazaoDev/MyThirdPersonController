@@ -71,13 +71,14 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    float jumpEffort = 0;
     private void Jump(float direction)
     {
         if (direction > 0 && onGround)
         {
             anim.SetBool("ReadyJump", true);
             readyJump = true;
-
+            jumpEffort += Time.deltaTime;
         }
         else if (readyJump)
         {
@@ -85,6 +86,8 @@ public class PlayerController : MonoBehaviour
             readyJump = false;
             anim.SetBool("ReadyJump", false);
         }
+
+        Debug.Log("JumpEffort" + jumpEffort);
     }
 
     private void CheckOnGround()
@@ -96,12 +99,16 @@ public class PlayerController : MonoBehaviour
             if (!onGround)
             {
                 onGround = true;
+                anim.SetFloat("LandingVelocity", rb.velocity.magnitude);
                 anim.SetBool("Land", true);
+                anim.SetBool("Falling", false);
             }
         }
         else
         {
             onGround = false;
+            anim.SetBool("Falling", true);
+            anim.applyRootMotion = false;
         }
 
         Debug.DrawRay(transform.position + Vector3.up * groundRayDistance * 0.5f, -Vector3.up * groundRayDistance, Color.red);
@@ -109,7 +116,7 @@ public class PlayerController : MonoBehaviour
 
     public void Launch()
     {
-        rb.AddForce(0, jumpSpeed, 0);
+        rb.AddForce(0, jumpSpeed * Mathf.Clamp(jumpEffort, 1, 3), 0);
         anim.SetBool("Launch", false);
         anim.applyRootMotion = false;
     }
@@ -119,5 +126,6 @@ public class PlayerController : MonoBehaviour
         anim.SetBool("Land", false);
         anim.applyRootMotion = true;
         anim.SetBool("Launch", false);
+        jumpEffort = 0;
     }
 }
