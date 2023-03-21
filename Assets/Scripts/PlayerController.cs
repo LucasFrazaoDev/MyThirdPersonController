@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour
 
     private float _jumpDirection;
     private Vector2 _moveDirection;
+    private Vector2 _lookDirection;
+    private Vector2 _lastLookDirection;
     private float _desiredSpeed;
     private float _fowardSpeed;
     private bool readyJump = false;
@@ -18,6 +20,9 @@ public class PlayerController : MonoBehaviour
     private bool onGround = true;
     private float groundRayDistance = 1f;
 
+    [SerializeField] private float _xSensitivity = 0.5f;
+    [SerializeField] private float _ySensitivity = 0.5f;
+    [SerializeField] Transform spine;
     [SerializeField] private Transform weapon;
     [SerializeField] private Transform hand;
     [SerializeField] private Transform hip;
@@ -48,9 +53,23 @@ public class PlayerController : MonoBehaviour
         CheckOnGround();
     }
 
+    private void LateUpdate()
+    {
+        _lastLookDirection += new Vector2(-_lookDirection.y * _ySensitivity, _lookDirection.x * _xSensitivity);
+        _lastLookDirection.x = Mathf.Clamp(_lastLookDirection.x, -40f, 40f);
+        _lastLookDirection.y = Mathf.Clamp(_lastLookDirection.y, -30f, 60f);
+
+        spine.localEulerAngles = _lastLookDirection;
+    }
+
     public void OnMove(InputAction.CallbackContext context)
     {
         _moveDirection = context.ReadValue<Vector2>();
+    }
+
+    public void OnLook(InputAction.CallbackContext context)
+    {
+        _lookDirection = context.ReadValue<Vector2>();
     }
 
     public void OnJump(InputAction.CallbackContext context)
@@ -147,8 +166,8 @@ public class PlayerController : MonoBehaviour
     public void OnPickupGun()
     {
         weapon.SetParent(hand);
-        weapon.localPosition = new Vector3(-0.02f, 0.087f, 0.023f);
-        weapon.localRotation = Quaternion.Euler(-77.26f, -110.5f, -163.9f);
+        weapon.localPosition = new Vector3(-0.043f, 0.097f, 0.021f);
+        weapon.localRotation = Quaternion.Euler(-77.70f, -287.7f, 31.702f);
         weapon.localScale = Vector3.one;
     }
 

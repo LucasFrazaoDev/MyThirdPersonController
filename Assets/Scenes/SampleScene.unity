@@ -670,12 +670,17 @@ Transform:
   m_GameObject: {fileID: 1376801423}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 9.722803, y: 0.267, z: -2.9798727}
-  m_LocalScale: {x: 30, y: 1, z: 30}
+  m_LocalScale: {x: 20, y: 1, z: 20}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1609824753 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5165713976490612278, guid: 6554d53c4314e584cbbb40580bdbed1d, type: 3}
+  m_PrefabInstance: {fileID: 577128262426223488}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1978788004
 GameObject:
   m_ObjectHideFlags: 0
@@ -1170,7 +1175,19 @@ MonoBehaviour:
     m_ActionId: 47a3fc24-0a4d-4905-8f1a-054f330fb8ee
     m_ActionName: Player/Move[/Keyboard/w,/Keyboard/upArrow,/Keyboard/s,/Keyboard/downArrow,/Keyboard/a,/Keyboard/leftArrow,/Keyboard/d,/Keyboard/rightArrow]
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 919132149167881230}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnLook
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 05b4668a-3fec-46f7-a5ca-db6ae11a4eba
     m_ActionName: Player/Look[/Mouse/delta]
   - m_PersistentCalls:
@@ -1281,6 +1298,9 @@ MonoBehaviour:
   moveSpeed: 5
   maxForwardSpeed: 8
   turnSpeed: 100
+  _xSensitivity: 0.3
+  _ySensitivity: 0.3
+  spine: {fileID: 1609824753}
   weapon: {fileID: 1023682644}
   hand: {fileID: 896625751}
   hip: {fileID: 1294193218}
