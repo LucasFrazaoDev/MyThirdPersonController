@@ -27,6 +27,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform hand;
     [SerializeField] private Transform hip;
     [SerializeField] private LineRenderer _laser;
+    [SerializeField] private GameObject _crosshair;
+    [SerializeField] private GameObject _crossLight;
 
     const float GROUND_ACCEL = 5f;
     const float GROUND_DECEL = 25f;
@@ -54,15 +56,30 @@ public class PlayerController : MonoBehaviour
         if (anim.GetBool("Armed"))
         {
             _laser.gameObject.SetActive(true);
+            //_crosshair.gameObject.SetActive(true);
+            _crossLight.gameObject.SetActive(true);
+
             RaycastHit laserHit;
             Ray laserRay = new Ray(_laser.transform.position, _laser.transform.forward);
             if (Physics.Raycast(laserRay, out laserHit))
             {
                 _laser.SetPosition(1, _laser.transform.InverseTransformPoint(laserHit.point));
+                Vector3 crosshairLocation = Camera.main.WorldToScreenPoint(laserHit.point);
+                //_crosshair.transform.position = crosshairLocation;
+                _crossLight.transform.localPosition = new Vector3(0, 0, _laser.GetPosition(1).z * 0.9f);
+            }
+            else
+            {
+                //_crosshair.gameObject.SetActive(false);
+                _crossLight.gameObject.SetActive(true);
             }
         }
         else
+        {
             _laser.gameObject.SetActive(false);
+            //_crosshair.gameObject.SetActive(false);
+            _crossLight.gameObject.SetActive(true);
+        }
 
         CheckOnGround();
     }
