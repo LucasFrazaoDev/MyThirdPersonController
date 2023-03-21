@@ -19,6 +19,8 @@ public class PlayerController : MonoBehaviour
     private float jumpSpeed = 20000f;
     private bool onGround = true;
     private float groundRayDistance = 1f;
+    private bool _escapePressed = false;
+    private bool _cursorIsLocked = true;
 
     [SerializeField] private float _xSensitivity = 0.5f;
     [SerializeField] private float _ySensitivity = 0.5f;
@@ -50,6 +52,8 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        UpdateCursorLock();
+
         Move(_moveDirection);
         Jump(_jumpDirection);
 
@@ -86,11 +90,14 @@ public class PlayerController : MonoBehaviour
 
     private void LateUpdate()
     {
-        _lastLookDirection += new Vector2(-_lookDirection.y * _ySensitivity, _lookDirection.x * _xSensitivity);
-        _lastLookDirection.x = Mathf.Clamp(_lastLookDirection.x, -40f, 40f);
-        _lastLookDirection.y = Mathf.Clamp(_lastLookDirection.y, -30f, 60f);
+        if (anim.GetBool("Armed"))
+        {
+            _lastLookDirection += new Vector2(-_lookDirection.y * _ySensitivity, _lookDirection.x * _xSensitivity);
+            _lastLookDirection.x = Mathf.Clamp(_lastLookDirection.x, -40f, 40f);
+            _lastLookDirection.y = Mathf.Clamp(_lastLookDirection.y, -30f, 60f);
 
-        spine.localEulerAngles = _lastLookDirection;
+            spine.localEulerAngles = _lastLookDirection;
+        }
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -112,6 +119,14 @@ public class PlayerController : MonoBehaviour
     {
         if ((int)context.ReadValue<float>() == 1 && anim.GetBool("Armed"))
             anim.SetTrigger("Fire");
+    }
+
+    public void OnEscape(InputAction.CallbackContext context)
+    {
+        if ((int)context.ReadValue<float>() == 1)
+            _escapePressed = true;
+        else
+            _escapePressed = false;
     }
 
     public void OnArmed(InputAction.CallbackContext context)
@@ -208,5 +223,22 @@ public class PlayerController : MonoBehaviour
         weapon.localPosition = new Vector3(-0.151f, -0.097f, -0.08f);
         weapon.localRotation = Quaternion.Euler(-105.9f, -156.8f, -69.15f);
         weapon.localScale = Vector3.one;
+    }
+
+    public void UpdateCursorLock()
+    {
+        if (_escapePressed)
+            _cursorIsLocked = false;
+
+        if (_cursorIsLocked)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
     }
 }
