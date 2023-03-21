@@ -18,6 +18,10 @@ public class PlayerController : MonoBehaviour
     private bool onGround = true;
     private float groundRayDistance = 1f;
 
+    [SerializeField] private Transform weapon;
+    [SerializeField] private Transform hand;
+    [SerializeField] private Transform hip;
+
     const float GROUND_ACCEL = 5f;
     const float GROUND_DECEL = 25f;
 
@@ -52,6 +56,17 @@ public class PlayerController : MonoBehaviour
     public void OnJump(InputAction.CallbackContext context)
     {
         _jumpDirection = context.ReadValue<float>();
+    }
+
+    public void OnFire(InputAction.CallbackContext context)
+    {
+        if ((int)context.ReadValue<float>() == 1 && anim.GetBool("Armed"))
+            anim.SetTrigger("Fire");
+    }
+
+    public void OnArmed(InputAction.CallbackContext context)
+    {
+        anim.SetBool("Armed", !anim.GetBool("Armed"));
     }
 
     private void Move(Vector2 direction)
@@ -127,5 +142,21 @@ public class PlayerController : MonoBehaviour
         anim.applyRootMotion = true;
         anim.SetBool("Launch", false);
         jumpEffort = 0;
+    }
+
+    public void OnPickupGun()
+    {
+        weapon.SetParent(hand);
+        weapon.localPosition = new Vector3(-0.02f, 0.087f, 0.023f);
+        weapon.localRotation = Quaternion.Euler(-77.26f, -110.5f, -163.9f);
+        weapon.localScale = Vector3.one;
+    }
+
+    public void PutGunDown()
+    {
+        weapon.SetParent(hip);
+        weapon.localPosition = new Vector3(-0.151f, -0.097f, -0.08f);
+        weapon.localRotation = Quaternion.Euler(-105.9f, -156.8f, -69.15f);
+        weapon.localScale = Vector3.one;
     }
 }
