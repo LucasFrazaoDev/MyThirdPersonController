@@ -26,6 +26,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform weapon;
     [SerializeField] private Transform hand;
     [SerializeField] private Transform hip;
+    [SerializeField] private LineRenderer _laser;
 
     const float GROUND_ACCEL = 5f;
     const float GROUND_DECEL = 25f;
@@ -49,6 +50,19 @@ public class PlayerController : MonoBehaviour
     {
         Move(_moveDirection);
         Jump(_jumpDirection);
+
+        if (anim.GetBool("Armed"))
+        {
+            _laser.gameObject.SetActive(true);
+            RaycastHit laserHit;
+            Ray laserRay = new Ray(_laser.transform.position, _laser.transform.forward);
+            if (Physics.Raycast(laserRay, out laserHit))
+            {
+                _laser.SetPosition(1, _laser.transform.InverseTransformPoint(laserHit.point));
+            }
+        }
+        else
+            _laser.gameObject.SetActive(false);
 
         CheckOnGround();
     }
