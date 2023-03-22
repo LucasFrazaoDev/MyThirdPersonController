@@ -23,6 +23,8 @@ public class PlayerController : MonoBehaviour
     private bool _escapePressed = false;
     private bool _cursorIsLocked = true;
     private int _health = 100;
+    private bool _firing = false;
+    private float jumpEffort = 0;
 
     [SerializeField] private float _xSensitivity = 0.5f;
     [SerializeField] private float _ySensitivity = 0.5f;
@@ -61,38 +63,7 @@ public class PlayerController : MonoBehaviour
         Move(_moveDirection);
         Jump(_jumpDirection);
 
-        if (anim.GetBool("Armed"))
-        {
-            _laser.gameObject.SetActive(true);
-            //_crosshair.gameObject.SetActive(true);
-            _crossLight.gameObject.SetActive(true);
-
-            RaycastHit laserHit;
-            Ray laserRay = new Ray(_laser.transform.position, _laser.transform.forward);
-            if (Physics.Raycast(laserRay, out laserHit))
-            {
-                _laser.SetPosition(1, _laser.transform.InverseTransformPoint(laserHit.point));
-                Vector3 crosshairLocation = Camera.main.WorldToScreenPoint(laserHit.point);
-                //_crosshair.transform.position = crosshairLocation;
-                _crossLight.transform.localPosition = new Vector3(0, 0, _laser.GetPosition(1).z * 0.9f);
-                
-                if (_firing && laserHit.collider.gameObject.tag == "Orb")
-                {
-                    laserHit.collider.gameObject.GetComponent<AIController>().BlowUp();
-                }
-            }
-            else
-            {
-                //_crosshair.gameObject.SetActive(false);
-                _crossLight.gameObject.SetActive(true);
-            }
-        }
-        else
-        {
-            _laser.gameObject.SetActive(false);
-            //_crosshair.gameObject.SetActive(false);
-            _crossLight.gameObject.SetActive(true);
-        }
+        Aiming();
 
         CheckOnGround();
     }
@@ -141,7 +112,41 @@ public class PlayerController : MonoBehaviour
         _jumpDirection = context.ReadValue<float>();
     }
 
-    private bool _firing = false;
+    private void Aiming()
+    {
+        if (anim.GetBool("Armed"))
+        {
+            _laser.gameObject.SetActive(true);
+            //_crosshair.gameObject.SetActive(true);
+            _crossLight.gameObject.SetActive(true);
+
+            RaycastHit laserHit;
+            Ray laserRay = new Ray(_laser.transform.position, _laser.transform.forward);
+            if (Physics.Raycast(laserRay, out laserHit))
+            {
+                _laser.SetPosition(1, _laser.transform.InverseTransformPoint(laserHit.point));
+                Vector3 crosshairLocation = Camera.main.WorldToScreenPoint(laserHit.point);
+                //_crosshair.transform.position = crosshairLocation;
+                _crossLight.transform.localPosition = new Vector3(0, 0, _laser.GetPosition(1).z * 0.9f);
+
+                if (_firing && laserHit.collider.gameObject.tag == "Orb")
+                {
+                    laserHit.collider.gameObject.GetComponent<AIController>().BlowUp();
+                }
+            }
+            else
+            {
+                //_crosshair.gameObject.SetActive(false);
+                _crossLight.gameObject.SetActive(true);
+            }
+        }
+        else
+        {
+            _laser.gameObject.SetActive(false);
+            //_crosshair.gameObject.SetActive(false);
+            _crossLight.gameObject.SetActive(true);
+        }
+    }
 
     public void OnFire(InputAction.CallbackContext context)
     {
@@ -183,7 +188,6 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    float jumpEffort = 0;
     private void Jump(float direction)
     {
         if (direction > 0 && onGround)
@@ -199,7 +203,6 @@ public class PlayerController : MonoBehaviour
             anim.SetBool("ReadyJump", false);
         }
 
-        Debug.Log("JumpEffort" + jumpEffort);
     }
 
     private void CheckOnGround()
