@@ -56,6 +56,8 @@ public class PlayerController : MonoBehaviour
     {
         UpdateCursorLock();
 
+        if (isDead) return;
+
         Move(_moveDirection);
         Jump(_jumpDirection);
 
@@ -97,6 +99,7 @@ public class PlayerController : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (isDead) return;
         if (anim.GetBool("Armed"))
         {
             _lastLookDirection += new Vector2(-_lookDirection.y * _ySensitivity, _lookDirection.x * _xSensitivity);
@@ -117,6 +120,7 @@ public class PlayerController : MonoBehaviour
             if (_health <= 0)
             {
                 isDead = true;
+                anim.SetLayerWeight(1, 0);
                 anim.SetBool("Dead", true);
             }
         }
@@ -225,8 +229,10 @@ public class PlayerController : MonoBehaviour
     public void Launch()
     {
         rb.AddForce(0, jumpSpeed * Mathf.Clamp(jumpEffort, 1, 3), 0);
+        rb.AddForce(transform.forward * _fowardSpeed * 2000f);
         anim.SetBool("Launch", false);
         anim.applyRootMotion = false;
+        onGround = false;
     }
 
     public void Land()
