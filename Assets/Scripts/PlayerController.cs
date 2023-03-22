@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed = 2f;
     public float maxForwardSpeed = 8f;
     public float turnSpeed = 100f;
+    public bool isDead = false;
 
     private float _jumpDirection;
     private Vector2 _moveDirection;
@@ -21,6 +22,7 @@ public class PlayerController : MonoBehaviour
     private float groundRayDistance = 1f;
     private bool _escapePressed = false;
     private bool _cursorIsLocked = true;
+    private int _health = 100;
 
     [SerializeField] private float _xSensitivity = 0.5f;
     [SerializeField] private float _ySensitivity = 0.5f;
@@ -71,6 +73,11 @@ public class PlayerController : MonoBehaviour
                 Vector3 crosshairLocation = Camera.main.WorldToScreenPoint(laserHit.point);
                 //_crosshair.transform.position = crosshairLocation;
                 _crossLight.transform.localPosition = new Vector3(0, 0, _laser.GetPosition(1).z * 0.9f);
+                
+                if (_firing && laserHit.collider.gameObject.tag == "Orb")
+                {
+                    laserHit.collider.gameObject.GetComponent<AIController>().BlowUp();
+                }
             }
             else
             {
@@ -100,6 +107,21 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void OnCollisionEnter(Collision target)
+    {
+        if (target.gameObject.tag == "Bullet")
+        {
+            _health -= 10;
+            anim.SetTrigger("Hit");
+
+            if (_health <= 0)
+            {
+                isDead = true;
+                anim.SetBool("Dead", true);
+            }
+        }
+    }
+
     public void OnMove(InputAction.CallbackContext context)
     {
         _moveDirection = context.ReadValue<Vector2>();
@@ -115,10 +137,16 @@ public class PlayerController : MonoBehaviour
         _jumpDirection = context.ReadValue<float>();
     }
 
+    private bool _firing = false;
+
     public void OnFire(InputAction.CallbackContext context)
     {
+        _firing = false;
         if ((int)context.ReadValue<float>() == 1 && anim.GetBool("Armed"))
+        {
             anim.SetTrigger("Fire");
+            _firing = true;
+        }
     }
 
     public void OnEscape(InputAction.CallbackContext context)
