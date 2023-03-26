@@ -56,7 +56,7 @@ public class AIController : MonoBehaviour
         GameObject bulletObj = Instantiate(bullet, this.transform.position + this.transform.forward, this.transform.rotation);
         bulletObj.GetComponent<Rigidbody>().AddForce(this.transform.forward * 1000);
         canShoot = false;
-        Invoke("CanShoot", 1.5f);
+        Invoke("CanShoot", 2.5f);
     }
 
     void CanShoot()

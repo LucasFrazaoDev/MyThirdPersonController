@@ -16,19 +16,19 @@ public class PlayerController : MonoBehaviour
     private Vector2 _lastLookDirection;
     private float _desiredSpeed;
     private float _fowardSpeed;
-    private bool readyJump = false;
-    private float jumpSpeed = 20000f;
-    private bool onGround = true;
-    private float groundRayDistance = 1f;
+    private bool _readyJump = false;
+    private float _jumpSpeed = 20000f;
+    private bool _onGround = true;
+    private float _groundRayDistance = 1f;
     private bool _escapePressed = false;
     private bool _cursorIsLocked = true;
     private int _health = 100;
     private bool _firing = false;
-    private float jumpEffort = 0;
+    private float _jumpEffort = 0;
 
     [SerializeField] private float _xSensitivity = 0.5f;
     [SerializeField] private float _ySensitivity = 0.5f;
-    [SerializeField] Transform spine;
+    [SerializeField] private Transform spine;
     [SerializeField] private Transform weapon;
     [SerializeField] private Transform hand;
     [SerializeField] private Transform hip;
@@ -190,16 +190,16 @@ public class PlayerController : MonoBehaviour
 
     private void Jump(float direction)
     {
-        if (direction > 0 && onGround)
+        if (direction > 0 && _onGround)
         {
             anim.SetBool("ReadyJump", true);
-            readyJump = true;
-            jumpEffort += Time.deltaTime;
+            _readyJump = true;
+            _jumpEffort += Time.deltaTime;
         }
-        else if (readyJump)
+        else if (_readyJump)
         {
             anim.SetBool("Launch", true);
-            readyJump = false;
+            _readyJump = false;
             anim.SetBool("ReadyJump", false);
         }
 
@@ -208,12 +208,12 @@ public class PlayerController : MonoBehaviour
     private void CheckOnGround()
     {
         RaycastHit hit;
-        Ray ray = new Ray(transform.position + Vector3.up * groundRayDistance * 0.5f, -Vector3.up);
-        if (Physics.Raycast(ray, out hit, groundRayDistance))
+        Ray ray = new Ray(transform.position + Vector3.up * _groundRayDistance * 0.5f, -Vector3.up);
+        if (Physics.Raycast(ray, out hit, _groundRayDistance))
         {
-            if (!onGround)
+            if (!_onGround)
             {
-                onGround = true;
+                _onGround = true;
                 anim.SetFloat("LandingVelocity", rb.velocity.magnitude);
                 anim.SetBool("Land", true);
                 anim.SetBool("Falling", false);
@@ -221,21 +221,21 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            onGround = false;
+            _onGround = false;
             anim.SetBool("Falling", true);
             anim.applyRootMotion = false;
         }
 
-        Debug.DrawRay(transform.position + Vector3.up * groundRayDistance * 0.5f, -Vector3.up * groundRayDistance, Color.red);
+        Debug.DrawRay(transform.position + Vector3.up * _groundRayDistance * 0.5f, -Vector3.up * _groundRayDistance, Color.red);
     }
 
     public void Launch()
     {
-        rb.AddForce(0, jumpSpeed * Mathf.Clamp(jumpEffort, 1, 3), 0);
+        rb.AddForce(0, _jumpSpeed * Mathf.Clamp(_jumpEffort, 1, 3), 0);
         rb.AddForce(transform.forward * _fowardSpeed * 2000f);
         anim.SetBool("Launch", false);
         anim.applyRootMotion = false;
-        onGround = false;
+        _onGround = false;
     }
 
     public void Land()
@@ -243,7 +243,7 @@ public class PlayerController : MonoBehaviour
         anim.SetBool("Land", false);
         anim.applyRootMotion = true;
         anim.SetBool("Launch", false);
-        jumpEffort = 0;
+        _jumpEffort = 0;
     }
 
     public void OnPickupGun()
